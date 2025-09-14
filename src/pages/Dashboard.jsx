@@ -49,8 +49,8 @@ export default function Dashboard() {
         <Card className="text-center">
           <CardHeader>
             <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <CardTitle className="text-2xl">No Resume Uploaded</CardTitle>
-            <CardDescription>
+            <CardTitle className="font-bold text-2xl">No Resume Uploaded</CardTitle>
+            <CardDescription className="font-bold text-muted-foreground">
               Upload your resume to start getting likes and feedback from recruiters
             </CardDescription>
           </CardHeader>

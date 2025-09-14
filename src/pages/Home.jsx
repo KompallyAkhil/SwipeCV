@@ -12,7 +12,7 @@ export default function Home() {
           Find Your Perfect
           <span className="text-primary"> Career Match</span>
         </h1>
-        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+        <p className="text-xl font-medium text-muted-foreground mb-8 max-w-2xl mx-auto">
           SwipeCV revolutionizes hiring by letting recruiters swipe through resumes like dating profiles. 
           Get instant feedback and connect with the right opportunities.
         </p>

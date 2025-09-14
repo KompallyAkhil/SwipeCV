@@ -91,7 +91,9 @@ export default function Upload() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UploadIcon className="h-6 w-6" />
-            Upload Your Resume
+            <p className='font-bold text-2xl'>
+              Upload Your Resume
+            </p>
           </CardTitle>
           <CardDescription>
             Upload multiple resumes with different titles and skills to maximize
