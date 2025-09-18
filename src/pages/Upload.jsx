@@ -13,7 +13,7 @@ export default function Upload() {
   const [uploaded, setUploaded] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
   const [uploadedUrl, setUploadedUrl] = useState("");
-
+  const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
     if (
@@ -34,7 +34,8 @@ export default function Upload() {
       const formData = new FormData();
       formData.append("resume", file);
       formData.append("resumeTitle", resumeTitle);
-      formData.append("user", user.username.charAt(0).toUpperCase() + user.username.slice(1));
+      formData.append("user", name);
+      formData.append("email", user.primaryEmailAddress.emailAddress);
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/uploadResume`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { Heart, X, TrendingUp, Users, FileText } from 'lucide-react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import LikedResumes from './LikedResumes'
 export default function Dashboard() {
   const { user } = useUser()
   const [stats, setStats] = useState({
@@ -13,13 +14,14 @@ export default function Dashboard() {
     totalViews: 0,
     hasResume: false
   })
+  const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
   const [eachResumeDetails, setEachResumeDetails] = useState();
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate();
   const fetchDashboardData = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/dashboard/${user.username.charAt(0).toUpperCase() + user.username.slice(1)}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/dashboard/${name}`
       )
       setStats(response.data)
     } catch (error) {
@@ -31,7 +33,7 @@ export default function Dashboard() {
   const fetchEachResumeDetails = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/resumes/feedback/${user.username.charAt(0).toUpperCase() + user.username.slice(1)}`
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/resumes/feedback/${name}`
       )
       setEachResumeDetails(response.data);
     } catch (error) {
@@ -193,6 +195,7 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
+      <LikedResumes/>
 
     </div>
   )

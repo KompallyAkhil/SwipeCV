@@ -17,11 +17,11 @@ export default function Swipe() {
     const interval = setInterval(fetchResumes, 30000);
     return () => clearInterval(interval);
   }, [user])
-
+  const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
   const fetchResumes = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_API_URL}/getResumes/${user.username.charAt(0).toUpperCase() + user.username.slice(1)}`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_API_URL}/getResumes/${name}`);
       setResumes(response.data);
       setCurrentIndex(response.data.length - 1);
     } catch (error) {
@@ -37,7 +37,7 @@ export default function Swipe() {
 
       try {
         await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/swipeResume`, {
-          currentUser: user.username.charAt(0).toUpperCase() + user.username.slice(1),
+          currentUser: name,
           resumeOwner: resume.name,
           action,
           resume,
