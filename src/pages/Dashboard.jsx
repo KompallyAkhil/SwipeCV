@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Heart, X, TrendingUp, Users, FileText } from 'lucide-react'
 import axios from 'axios'
-
+import { useNavigate } from 'react-router-dom';
 export default function Dashboard() {
   const { user } = useUser()
   const [stats, setStats] = useState({
@@ -13,8 +13,9 @@ export default function Dashboard() {
     totalViews: 0,
     hasResume: false
   })
+  const [eachResumeDetails, setEachResumeDetails] = useState();
   const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate();
   const fetchDashboardData = async () => {
     try {
       const response = await axios.get(
@@ -27,10 +28,21 @@ export default function Dashboard() {
       setLoading(false)
     }
   }
+  const fetchEachResumeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_API_URL}/api/resumes/feedback/${user.username.charAt(0).toUpperCase() + user.username.slice(1)}`
+      )
+      setEachResumeDetails(response.data);
+    } catch (error) {
+      console.error('Failed to fetch each resume details:', error)
+    }
+  }
+
 
   useEffect(() => {
     fetchDashboardData()
-
+    fetchEachResumeDetails();
     const interval = setInterval(fetchDashboardData, 30000)
     return () => clearInterval(interval)
   }, [user])
@@ -55,7 +67,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => window.location.href = '/upload'}>
+            <Button onClick={() => navigate('/upload')}>
               Upload Resume
             </Button>
           </CardContent>
@@ -127,11 +139,61 @@ export default function Dashboard() {
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-4">
-          <Button onClick={() => window.location.href = '/upload'}>Update Resume</Button>
-          <Button variant="outline" onClick={() => window.location.href = '/swipe'}>Start Swiping</Button>
-          <Button variant="outline" onClick={fetchDashboardData}>Refresh Data</Button>
+          <Button onClick={() => navigate('/upload')}>Upload Resume</Button>
+          <Button variant="outline" onClick={() => navigate('/swipe')}>Start Swiping</Button>
+          <Button variant="outline" onClick={() => fetchDashboardData()}>Refresh Data</Button>
         </CardContent>
       </Card>
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+            <FileText className="h-6 w-6 text-primary" /> Resume Feedbacks
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {eachResumeDetails?.resumes?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {eachResumeDetails.resumes.map((resume) => (
+                <div
+                  key={resume.resumeId}
+                  className="p-6 border rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-blue-500" /> {resume.title}
+                    </h3>
+                    <a
+                      href={resume.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex px-3 py-1 rounded-full items-center hover:underline font-medium bg-gray-100 texxt-sm"
+                    >
+                       View PDF
+                    </a>
+                  </div>
+                  <p className="text-xs font-bold text-gray-500 mb-2">
+                    Uploaded: {new Date(resume.uploadedAt).toLocaleString()}
+                  </p>
+                  <div className="flex gap-4 mt-4">
+                    <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                      <Heart className="h-4 w-4 text-green-500" /> {resume.likes} Likes
+                    </span>
+                    <span className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                      <X className="h-4 w-4 text-red-500" /> {resume.dislikes} Dislikes
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+              <p className="text-gray-500 text-lg">No resumes found for this user.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   )
 }
