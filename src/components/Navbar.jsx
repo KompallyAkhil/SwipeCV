@@ -1,13 +1,16 @@
-import { Link } from 'react-router-dom'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
-import { Button } from './ui/button'
-import { Heart, Upload, BarChart3 } from 'lucide-react'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { SignedIn, SignedOut, SignInButton, UserButton, } from "@clerk/clerk-react";
+import { Button } from "./ui/button";
+import { Heart, Upload, BarChart3, Menu, X } from "lucide-react";
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between items-center h-16">
+
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <Heart className="h-8 w-8 text-primary" />
@@ -15,7 +18,8 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+
+          <div className="hidden md:flex items-center space-x-4">
             <SignedIn>
               <Link to="/swipe">
                 <Button variant="ghost" size="sm">
@@ -37,15 +41,59 @@ export default function Navbar() {
               </Link>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
-            
+
             <SignedOut>
               <SignInButton mode="modal">
                 <Button>Sign In</Button>
               </SignInButton>
             </SignedOut>
           </div>
+
+
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 rounded-md hover:bg-accent focus:outline-none"
+            >
+              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
+
+        {menuOpen && (
+          <div className="md:hidden flex flex-col  space-y-2 mt-2 pb-4 border-t">
+            <SignedIn>
+              <Link to="/swipe" onClick={() => setMenuOpen(false)}>
+                <Button variant="ghost" size="sm" className="w-full justify-start">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Swipe
+                </Button>
+              </Link>
+              <Link to="/upload" onClick={() => setMenuOpen(false)}>
+                <Button variant="ghost" size="sm" className="w-full justify-start">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload
+                </Button>
+              </Link>
+              <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
+                <Button variant="ghost" size="sm" className="w-full justify-start">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <div className="px-2">
+                <UserButton afterSignOutUrl="/" />
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button className="w-full">Sign In</Button>
+              </SignInButton>
+            </SignedOut>
+          </div>
+        )}
       </div>
     </nav>
-  )
+  );
 }
