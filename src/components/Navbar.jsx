@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { SignedIn, SignedOut, SignInButton, UserButton, } from "@clerk/clerk-react";
 import { Button } from "./ui/button";
 import { Heart, Upload, BarChart3, Menu, X } from "lucide-react";
-
+import { useUser } from "@clerk/clerk-react";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useUser();
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,13 +56,13 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-2 rounded-md hover:bg-accent focus:outline-none"
             >
-              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {!user ? <SignInButton mode="modal"><Button>SignIn</Button></SignInButton> : user && menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden flex flex-col  space-y-2 mt-2 pb-4 border-t">
+          <div className="md:hidden flex flex-col items-center space-y-2 mt-2 pb-4 border-t">
             <SignedIn>
               <Link to="/swipe" onClick={() => setMenuOpen(false)}>
                 <Button variant="ghost" size="sm" className="w-full justify-start">
@@ -85,12 +86,6 @@ export default function Navbar() {
                 <UserButton afterSignOutUrl="/" />
               </div>
             </SignedIn>
-
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button className="w-full">Sign In</Button>
-              </SignInButton>
-            </SignedOut>
           </div>
         )}
       </div>
