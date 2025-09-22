@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import axios from "axios";
 import { Heart, FileText, ExternalLink } from "lucide-react";
+import { getSocket } from "../lib/socket";
 
 const LikedResumes = () => {
   const { user } = useUser();
@@ -11,19 +12,29 @@ const LikedResumes = () => {
   const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
 
   useEffect(() => {
+    let mounted = true;
     const fetchLikedResumes = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_API_URL}/likedResumes/${name}`
         );
-        setLikedResumes(response.data);
+        if (mounted) setLikedResumes(response.data);
       } catch (error) {
         console.error("Error fetching liked resumes:", error);
       }
     };
 
     fetchLikedResumes();
-  }, []);
+
+    const socket = getSocket({ username: name });
+    const onRefresh = () => fetchLikedResumes();
+    socket.on('likedResumes:refresh', onRefresh);
+
+    return () => {
+      mounted = false;
+      socket.off('likedResumes:refresh', onRefresh);
+    };
+  }, [name]);
   return (
     <>
       {likedResumes && likedResumes.length > 0 && (

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Heart, X, FileText, User, Mail, Download } from 'lucide-react'
 import axios from 'axios'
+import { getSocket } from '../lib/socket'
 
 export default function Swipe() {
   const { user } = useUser()
@@ -12,12 +13,45 @@ export default function Swipe() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [viewingPDF, setViewingPDF] = useState(null)
-  useEffect(() => {
-    fetchResumes()
-    const interval = setInterval(fetchResumes, 30000);
-    return () => clearInterval(interval);
-  }, [user])
   const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
+  useEffect(() => {
+    let mounted = true
+    fetchResumes()
+
+    const socket = getSocket({ username: name })
+
+    const onBatch = (batch) => {
+      if (!mounted) return
+      setResumes(batch)
+      setCurrentIndex(batch.length - 1)
+      setLoading(false)
+    }
+    const onRemoved = ({ cloudinaryId }) => {
+      if (!mounted) return
+      setResumes(prev => {
+        const next = prev.filter(r => r.cloudinaryId !== cloudinaryId)
+        setCurrentIndex(idx => Math.min(idx, next.length - 1))
+        return next
+      })
+    }
+    const onRefresh = () => {
+      socket.emit('resumes:fetch', { username: name })
+    }
+
+    socket.on('resumes:batch', onBatch)
+    socket.on('resumes:removed', onRemoved)
+    socket.on('resumes:refresh', onRefresh)
+
+    // ask server for latest
+    socket.emit('resumes:fetch', { username: name })
+
+    return () => {
+      mounted = false
+      socket.off('resumes:batch', onBatch)
+      socket.off('resumes:removed', onRemoved)
+      socket.off('resumes:refresh', onRefresh)
+    }
+  }, [user, name])
   const fetchResumes = async () => {
     try {
       setLoading(true)
