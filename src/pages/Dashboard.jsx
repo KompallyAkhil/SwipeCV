@@ -6,7 +6,6 @@ import { Heart, X, TrendingUp, Users, FileText } from 'lucide-react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import LikedResumes from './LikedResumes'
-import { getSocket } from '../lib/socket'
 export default function Dashboard() {
   const { user } = useUser()
   const [stats, setStats] = useState({
@@ -44,23 +43,10 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    let mounted = true
     fetchDashboardData()
     fetchEachResumeDetails();
-
-    const socket = getSocket({ username: name })
-    const onDashUpdate = (payload) => {
-      if (mounted) setStats(payload)
-    }
-
-    socket.on('dashboard:update', onDashUpdate)
-    // Request a fresh snapshot on connect
-    socket.emit('dashboard:fetch', { username: name })
-
-    return () => {
-      mounted = false
-      socket.off('dashboard:update', onDashUpdate)
-    }
+    const interval = setInterval(fetchDashboardData, 30000)
+    return () => clearInterval(interval)
   }, [user])
 
   if (loading) {
