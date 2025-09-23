@@ -4,29 +4,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import axios from "axios";
 import { Heart, FileText, ExternalLink } from "lucide-react";
+import { Skeleton } from "../components/ui/skeleton";
 
 const LikedResumes = () => {
   const { user } = useUser();
   const [likedResumes, setLikedResumes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
 
   useEffect(() => {
+    let mounted = true;
     const fetchLikedResumes = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_API_URL}/likedResumes/${name}`
         );
-        setLikedResumes(response.data);
+        if (mounted) setLikedResumes(response.data);
       } catch (error) {
         console.error("Error fetching liked resumes:", error);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
-
     fetchLikedResumes();
-  }, []);
+    return () => { mounted = false; }
+  }, [name]);
+
   return (
     <>
-      {likedResumes && likedResumes.length > 0 && (
+      {loading ? (
+        <Card className="mt-8 shadow-lg rounded-2xl">
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-72 mt-2" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[0,1].map((i) => (
+                <div key={i} className="border rounded-xl p-4 bg-card">
+                  <Skeleton className="h-5 w-40 mb-3" />
+                  <Skeleton className="h-4 w-56 mb-4" />
+                  <Skeleton className="h-9 w-28 rounded-md" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ) : likedResumes && likedResumes.length > 0 ? (
         <Card className="mt-8 shadow-lg rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
@@ -44,7 +69,7 @@ const LikedResumes = () => {
                 {likedResumes.map((resume, idx) => (
                   <Card
                     key={idx}
-                    className="border hover:shadow-md transition rounded-xl"
+                    className="border hover:shadow-md transition rounded-xl bg-card"
                   >
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">
@@ -53,11 +78,10 @@ const LikedResumes = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="mb-3 text-sm text-gray-600">
+                      <p className="mb-3 text-sm text-muted-foreground">
                         <strong>Email:</strong> {resume.email}
                       </p>
                       <Button
-                        variant="outline"
                         size="sm"
                         asChild
                         className="flex items-center gap-2"
@@ -76,13 +100,13 @@ const LikedResumes = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500">
+              <p className="text-center text-muted-foreground">
                 You haven’t liked any resumes yet.
               </p>
             )}
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </>
   );
 };

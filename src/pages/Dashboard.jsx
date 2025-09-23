@@ -6,6 +6,8 @@ import { Heart, X, TrendingUp, Users, FileText } from 'lucide-react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import LikedResumes from './LikedResumes'
+import { Skeleton } from '../components/ui/skeleton'
+
 export default function Dashboard() {
   const { user } = useUser()
   const [stats, setStats] = useState({
@@ -47,12 +49,84 @@ export default function Dashboard() {
     fetchEachResumeDetails();
     const interval = setInterval(fetchDashboardData, 30000)
     return () => clearInterval(interval)
-  }, [user])
+  }, [user, name])
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p>Loading dashboard...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-3 w-40 mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-3 w-40 mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-3 w-40 mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-14" />
+              <Skeleton className="h-3 w-40 mt-2" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="mt-8">
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 border rounded-xl bg-card">
+                <Skeleton className="h-5 w-40 mb-2" />
+                <Skeleton className="h-4 w-24 mb-4" />
+                <div className="flex gap-4 mt-4">
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </div>
+              </div>
+              <div className="p-6 border rounded-xl bg-card">
+                <Skeleton className="h-5 w-40 mb-2" />
+                <Skeleton className="h-4 w-24 mb-4" />
+                <div className="flex gap-4 mt-4">
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -158,15 +232,15 @@ export default function Dashboard() {
               {eachResumeDetails.resumes.map((resume) => (
                 <div
                   key={resume.resumeId}
-                  className="p-6 border rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="p-6 border rounded-xl bg-card shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
                       <FileText className="h-5 w-5 text-blue-500" /> {resume.title}
                     </h3>
                     <a
                       href={resume.url}
-                      target="_blank"
+                      target="_blank" 
                       rel="noopener noreferrer"
                       className="flex px-3 py-1 rounded-full items-center hover:underline font-medium bg-gray-100 texxt-sm"
                     >

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Heart, X, FileText, User, Mail, Download } from 'lucide-react'
 import axios from 'axios'
+import { Skeleton } from '../components/ui/skeleton'
 
 export default function Swipe() {
   const { user } = useUser()
@@ -12,12 +13,12 @@ export default function Swipe() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [viewingPDF, setViewingPDF] = useState(null)
+  const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
   useEffect(() => {
     fetchResumes()
-    const interval = setInterval(fetchResumes, 30000);
-    return () => clearInterval(interval);
-  }, [user])
-  const name = user.username.charAt(0).toUpperCase() + user.username.slice(1);
+    const interval = setInterval(fetchResumes, 30000)
+    return () => clearInterval(interval)
+  }, [user, name])
   const fetchResumes = async () => {
     try {
       setLoading(true)
@@ -64,7 +65,43 @@ export default function Swipe() {
   }
 
   if (loading) {
-    return <p className="text-center mt-8">Loading resumes...</p>
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-md">
+        <div className="text-center mb-8">
+          <Skeleton className="h-6 w-40 mx-auto mb-2" />
+          <Skeleton className="h-4 w-56 mx-auto" />
+        </div>
+
+        <div className="relative h-96 mb-8">
+          <Card className="h-full shadow-lg">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4" />
+              <Skeleton className="h-5 w-32 mx-auto mb-2" />
+              <Skeleton className="h-4 w-24 mx-auto" />
+              <div className="flex items-center justify-center gap-1 mt-2">
+                <Skeleton className="h-4 w-4" rounded={true} />
+                <Skeleton className="h-4 w-28" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Skeleton className="h-10 flex-1" />
+                <Skeleton className="h-10 w-10" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-center gap-4">
+          <div className="w-16 h-16 rounded-full">
+            <Skeleton className="w-16 h-16 rounded-full" />
+          </div>
+          <div className="w-16 h-16 rounded-full">
+            <Skeleton className="w-16 h-16 rounded-full" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (resumes.length === 0) {
